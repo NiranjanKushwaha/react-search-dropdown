@@ -56,7 +56,7 @@ const SearchInput = () => {
         <input
           type="text"
           className="search_input"
-          placeholder="Search here"
+          placeholder="Search users by ID,address,name,pin and items"
           value={searchText}
           onChange={handleSearchText}
         />

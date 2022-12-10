@@ -1,8 +1,9 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { GlobalContext } from "../GlobalContext";
 
 const DropdownComponent = () => {
-  const { matchingData } = useContext(GlobalContext);
+  const { matchingData, setMatchingData, searchText } =
+    useContext(GlobalContext);
   const getItems = (itemsArr) => {
     if (itemsArr && itemsArr.length) {
       return itemsArr.map((el, index) => (
@@ -12,6 +13,22 @@ const DropdownComponent = () => {
       ));
     }
   };
+
+  //  style={
+  //     el.name.toLowerCase().includes(searchText.toLowerCase())
+  //     ? { color: "red" }
+  //     : {}
+  // }
+
+  function isHighLighted(value) {
+    if (value && value.toLowerCase().includes(searchText.toLowerCase())) {
+      const re = new RegExp(searchText, "gi");
+      return value.replace(re, `<span class="highlight">${searchText}</span>`);
+    } else {
+      return value;
+    }
+  }
+
   return (
     <div className="dropdown_container">
       <div
@@ -27,18 +44,31 @@ const DropdownComponent = () => {
               <div className="card_flex">
                 <div>
                   <strong>Id:</strong>
-                  <p>{el.id}</p>
+                  <p
+                    dangerouslySetInnerHTML={{ __html: isHighLighted(el.id) }}
+                  ></p>
                   <strong>Name:</strong>
-                  <p>{el.name}</p>
+                  <p
+                    dangerouslySetInnerHTML={{ __html: isHighLighted(el.name) }}
+                  ></p>
                 </div>
-                <div>
+                <div style={{ marginLeft: "10rem" }}>
                   <strong>Pin:</strong>
-                  <p>{el.pincode}</p>
+                  <p
+                    dangerouslySetInnerHTML={{
+                      __html: isHighLighted(el.pincode),
+                    }}
+                  ></p>
                   <strong>Items:</strong> <p>{getItems(el.items)}</p>
                 </div>
               </div>
               <div>
-                <strong>Address:</strong> <p>{el.address}</p>
+                <strong>Address:</strong>
+                <p
+                  dangerouslySetInnerHTML={{
+                    __html: isHighLighted(el.address),
+                  }}
+                ></p>
               </div>
             </div>
           ))
