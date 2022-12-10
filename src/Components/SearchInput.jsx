@@ -1,22 +1,48 @@
-import React, { useEffect, useContext } from "react";
+import React, { useContext } from "react";
 import { GlobalContext } from "../GlobalContext";
-import { getData } from "../services/CommonApiService";
 
 const SearchInput = () => {
-  const { setApiListData } = useContext(GlobalContext);
-  useEffect(() => {
-    const apiUrl = "http://www.mocky.io/v2/5ba8efb23100007200c2750c";
-    getData(apiUrl)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data && data.length) {
-          console.log(data);
-          setApiListData(data);
-        } else {
+  const {
+    apiListData,
+    setIsSearchTextPresent,
+    searchText,
+    setSearchText,
+    setMatchingData,
+  } = useContext(GlobalContext);
+
+  const handleSearchText = (e) => {
+    const text = e.target.value;
+    setSearchText(text);
+    if (text) {
+      setIsSearchTextPresent(true);
+      const listData = getDeepCopy(apiListData);
+      const filteredData = listData.filter((el) => {
+        if (Object.values(el).some((item) => isExists(item, text))) {
+          return el;
         }
-      })
-      .catch((err) => alert(err));
-  }, []);
+      });
+      setMatchingData(filteredData);
+    } else {
+      setIsSearchTextPresent(false);
+      setMatchingData([]);
+    }
+  };
+
+  function isExists(data, value) {
+    if (data && typeof data === "string") {
+      return data.toLowerCase().includes(value.toLowerCase());
+    }
+    if (data && Array.isArray(data)) {
+      return data.some((item) =>
+        item.toString().toLowerCase().includes(value.toLowerCase())
+      );
+    }
+  }
+
+  const getDeepCopy = (value) => {
+    return JSON.parse(JSON.stringify(value));
+  };
+
   return (
     <div className="input_container">
       <div className="icon_container">
@@ -27,7 +53,13 @@ const SearchInput = () => {
         />
       </div>
       <div>
-        <input type="text" className="search_input" placeholder="Search here" />
+        <input
+          type="text"
+          className="search_input"
+          placeholder="Search here"
+          value={searchText}
+          onChange={handleSearchText}
+        />
       </div>
     </div>
   );
