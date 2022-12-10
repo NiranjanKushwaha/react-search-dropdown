@@ -5,8 +5,10 @@ const DropdownComponent = () => {
   const { matchingData } = useContext(GlobalContext);
   const getItems = (itemsArr) => {
     if (itemsArr && itemsArr.length) {
-      return itemsArr.map((el) => (
-        <span style={{ marginLeft: "5px" }}>{el}</span>
+      return itemsArr.map((el, index) => (
+        <span style={{ marginLeft: "5px" }} key={index}>
+          {el}
+        </span>
       ));
     }
   };
