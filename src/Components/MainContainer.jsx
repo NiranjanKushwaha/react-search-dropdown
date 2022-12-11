@@ -12,10 +12,7 @@ const MainContainer = () => {
       .then((res) => res.json())
       .then((data) => {
         if (data && data.length) {
-          console.log(data);
           setApiListData(data);
-          // to see scroll bar duplicating items for test
-          // setApiListData(data.concat(data));
         } else {
           setApiListData([]);
         }

@@ -2,8 +2,29 @@ import React, { useContext, useEffect } from "react";
 import { GlobalContext } from "../GlobalContext";
 
 const DropdownComponent = () => {
-  const { matchingData, setMatchingData, searchText } =
-    useContext(GlobalContext);
+  const {
+    setSearchText,
+    matchingData,
+    setisHighlight,
+    searchText,
+    activeCardId,
+    isHighlight,
+    setActiveCardId,
+    isMouseOver,
+    setIsMouseOver,
+    isKeyUpOrDownPressed,
+    setIsKeyUpOrDownPressed,
+    setIsSearchTextPresent,
+  } = useContext(GlobalContext);
+
+  useEffect(() => {
+    if (activeCardId >= -1 && isHighlight && !isMouseOver) {
+      let card = document.getElementById(`card_${activeCardId}`);
+      if (card) {
+        card.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  }, [activeCardId, isHighlight, isMouseOver]);
   const getItems = (itemsArr) => {
     if (itemsArr && itemsArr.length) {
       return itemsArr.map((el, index) => (
@@ -14,12 +35,6 @@ const DropdownComponent = () => {
     }
   };
 
-  //  style={
-  //     el.name.toLowerCase().includes(searchText.toLowerCase())
-  //     ? { color: "red" }
-  //     : {}
-  // }
-
   function isHighLighted(value) {
     if (value && value.toLowerCase().includes(searchText.toLowerCase())) {
       const re = new RegExp(searchText, "gi");
@@ -28,6 +43,27 @@ const DropdownComponent = () => {
       return value;
     }
   }
+
+  const handleMouseOver = (e) => {
+    if (!isKeyUpOrDownPressed) {
+      setIsMouseOver(true);
+      e.stopPropagation();
+      const cardId = e.target.id;
+      console.log(e.target.id + Number(cardId.split("_").at(-1)));
+      setisHighlight(true);
+      if (cardId) {
+        setActiveCardId(Number(cardId.split("_").at(-1)));
+      }
+    }
+  };
+
+  const handleClick = (name) => {
+    setisHighlight(true);
+    if (name) {
+      setSearchText(name);
+      setIsSearchTextPresent(false);
+    }
+  };
 
   return (
     <div className="dropdown_container">
@@ -39,8 +75,23 @@ const DropdownComponent = () => {
         }`}
       >
         {matchingData && matchingData.length ? (
-          matchingData.map((el) => (
-            <div className="custom_card" key={el.id}>
+          matchingData.map((el, index) => (
+            <div
+              className={`${
+                isMouseOver ? "custom_card card_hover" : "custom_card"
+              }`}
+              key={el.id}
+              id={`card_${index}`}
+              style={{
+                background:
+                  activeCardId === index && isHighlight && !isMouseOver
+                    ? "bisque"
+                    : "",
+              }}
+              onMouseOver={handleMouseOver}
+              onMouseMove={() => setIsKeyUpOrDownPressed(false)}
+              onClick={() => handleClick(el.name)}
+            >
               <div className="card_flex">
                 <div>
                   <strong>Id:</strong>
@@ -73,7 +124,9 @@ const DropdownComponent = () => {
             </div>
           ))
         ) : (
-          <span>No matching items found!</span>
+          <div>
+            <span style={{ marginLeft: "10rem" }}>No user found!</span>
+          </div>
         )}
       </div>
     </div>

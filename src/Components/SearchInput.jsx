@@ -8,24 +8,41 @@ const SearchInput = () => {
     searchText,
     setSearchText,
     setMatchingData,
+    matchingData,
+    activeCardId,
+    setActiveCardId,
+    setisHighlight,
+    setIsMouseOver,
+    setIsKeyUpOrDownPressed,
   } = useContext(GlobalContext);
 
   const handleSearchText = (e) => {
     const text = e.target.value;
     setSearchText(text);
     if (text) {
+      commonFilterFunction(text);
+    } else {
+      setIsSearchTextPresent(false);
+      setMatchingData([]);
+      setActiveCardId(-1);
+    }
+  };
+
+  function commonFilterFunction(searchText) {
+    if (searchText) {
       setIsSearchTextPresent(true);
       const listData = getDeepCopy(apiListData);
       const filteredData = listData.filter((el) => {
-        if (Object.values(el).some((item) => isExists(item, text))) {
+        if (Object.values(el).some((item) => isExists(item, searchText))) {
           return el;
         }
       });
       setMatchingData(filteredData);
-    } else {
-      setIsSearchTextPresent(false);
-      setMatchingData([]);
     }
+  }
+
+  const handleInputClick = () => {
+    commonFilterFunction(searchText);
   };
 
   function isExists(data, value) {
@@ -43,6 +60,37 @@ const SearchInput = () => {
     return JSON.parse(JSON.stringify(value));
   };
 
+  const visitCards = (event) => {
+    setIsMouseOver(false);
+    if (event.key === "ArrowDown" && matchingData.length) {
+      setisHighlight(true);
+      setIsKeyUpOrDownPressed(true);
+      if (activeCardId < matchingData.length - 1) {
+        setActiveCardId((prev) => prev + 1);
+      } else {
+        setActiveCardId(0);
+      }
+    } else if (event.key === "ArrowUp" && matchingData.length) {
+      setisHighlight(true);
+      setIsKeyUpOrDownPressed(true);
+      if (activeCardId > -1 && activeCardId < matchingData.length) {
+        setActiveCardId((prev) => prev - 1);
+      } else {
+        setActiveCardId(matchingData.length - 1);
+      }
+    } else {
+      setisHighlight(false);
+      setIsKeyUpOrDownPressed(false);
+    }
+  };
+
+  const clearSearchText = () => {
+    setSearchText("");
+    setIsSearchTextPresent(false);
+    setMatchingData([]);
+    setActiveCardId(-1);
+  };
+
   return (
     <div className="input_container">
       <div className="icon_container">
@@ -58,9 +106,22 @@ const SearchInput = () => {
           className="search_input"
           placeholder="Search users by ID,address,name,pin and items"
           value={searchText}
+          onClick={handleInputClick}
           onChange={handleSearchText}
+          onKeyDown={visitCards}
         />
       </div>
+      <button
+        className="delete_icon_container"
+        onClick={clearSearchText}
+        disabled={searchText ? false : true}
+      >
+        <img
+          className="delete_icon"
+          src="https://cdn-icons-png.flaticon.com/512/32/32178.png"
+          alt="search_icon"
+        />
+      </button>
     </div>
   );
 };
