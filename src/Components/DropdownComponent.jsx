@@ -46,10 +46,9 @@ const DropdownComponent = () => {
 
   const handleMouseOver = (e) => {
     if (!isKeyUpOrDownPressed) {
-      setIsMouseOver(true);
       e.stopPropagation();
+      setIsMouseOver(true);
       const cardId = e.target.id;
-      console.log(e.target.id + Number(cardId.split("_").at(-1)));
       setisHighlight(true);
       if (cardId) {
         setActiveCardId(Number(cardId.split("_").at(-1)));
@@ -57,10 +56,10 @@ const DropdownComponent = () => {
     }
   };
 
-  const handleClick = (name) => {
+  const handleClick = () => {
     setisHighlight(true);
-    if (name) {
-      setSearchText(name);
+    if (searchText) {
+      setSearchText(searchText);
       setIsSearchTextPresent(false);
     }
   };
@@ -90,7 +89,7 @@ const DropdownComponent = () => {
               }}
               onMouseOver={handleMouseOver}
               onMouseMove={() => setIsKeyUpOrDownPressed(false)}
-              onClick={() => handleClick(el.name)}
+              onClick={handleClick}
             >
               <div className="card_flex">
                 <div>
@@ -110,7 +109,28 @@ const DropdownComponent = () => {
                       __html: isHighLighted(el.pincode),
                     }}
                   ></p>
-                  <strong>Items:</strong> <p>{getItems(el.items)}</p>
+                  {/* code which will highlight items if u uncomment it */}
+                  {/* <strong>Items:</strong>
+                  <p>
+                    {el.items &&
+                      el.items.map((item) => {
+                        return (
+                          <li
+                            dangerouslySetInnerHTML={{
+                              __html: isHighLighted(item),
+                            }}
+                          ></li>
+                        );
+                      })}
+                  </p> */}
+                  {el.isFoundItem ? (
+                    <li>
+                      <span style={{ color: "blue", marginRight: "0.3rem" }}>
+                        {searchText}
+                      </span>
+                      <span>found in items</span>
+                    </li>
+                  ) : null}
                 </div>
               </div>
               <div>

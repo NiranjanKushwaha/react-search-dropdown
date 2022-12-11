@@ -17,7 +17,7 @@ const SearchInput = () => {
   } = useContext(GlobalContext);
 
   const handleSearchText = (e) => {
-    const text = e.target.value;
+    let text = e.target.value;
     setSearchText(text);
     if (text) {
       commonFilterFunction(text);
@@ -33,7 +33,19 @@ const SearchInput = () => {
       setIsSearchTextPresent(true);
       const listData = getDeepCopy(apiListData);
       const filteredData = listData.filter((el) => {
-        if (Object.values(el).some((item) => isExists(item, searchText))) {
+        if (
+          Object.values(el).some(
+            (item) => !Array.isArray(item) && isExists(item, searchText)
+          )
+        ) {
+          return el;
+        }
+        if (
+          Object.values(el).some(
+            (item) => Array.isArray(item) && isExists(item, searchText)
+          )
+        ) {
+          el["isFoundItem"] = true;
           return el;
         }
       });
